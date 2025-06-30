@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Pay with Square</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+ <script type="text/javascript" src="https://js.squareup.com/v2/paymentform"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background-color: #f9f9f9;
+      text-align: center;
+    }
+    .sq-input {
+      padding: 10px;
+      margin: 5px 0;
+      border-radius: 5px;
+      border: 1px solid #5100ff;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    #sq-creditcard {
+      background-color: #0099FF;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      cursor: pointer;
+      font-size: 16px;
+      width: 100%;
+      border-radius: 5px;
+    }
+    #sq-creditcard:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
+    }
+    .form-wrapper {
+      max-width: 400px;
+      margin: 0 auto;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+    img {
+      max-width: 150px;
+      margin-bottom: 10px;
+    }
+    #sq-card-number, #sq-expiration-date, #sq-cvv, #sq-postal-code {
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="form-wrapper">
+    <h2>Pay for Service</h2>
+
+    <form id="payment-form">
+      <div id="sq-card-number"></div>
+      <div id="sq-expiration-date"></div>
+      <div id="sq-cvv"></div>
+      <div id="sq-postal-code"></div>
+      <button id="sq-creditcard" type="button" disabled>Pay Online</button>
+    </form>
+  </div>
+
+  <script>
+    let paymentForm = new SqPaymentForm({
+      applicationId: "sandbox-sq0idb-X3LY3LoRNEyjo0PVX1owUw",
+      locationId: "LKVTFG8QGB1WQ",
+      inputClass: 'sq-input',
+      autoBuild: false,
+      inputStyles: [{ fontSize: '16px', padding: '10px' }],
+      cardNumber: { elementId: 'sq-card-number' },
+      cvv: { elementId: 'sq-cvv' },
+      expirationDate: { elementId: 'sq-expiration-date' },
+      postalCode: { elementId: 'sq-postal-code' },
+      callbacks: {
+        paymentFormLoaded: function () {
+          console.log("✅ Square form loaded");
+          document.getElementById("sq-creditcard").disabled = false;
+        },
+        cardNonceResponseReceived: function (errors, nonce) {
+          if (errors) {
+            alert("❌ Payment error: " + errors.map(e => e.message).join(", "));
+            return;
+          }
+
+          fetch("https://fft-payment-api.onrender.com/process-payment", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ nonce: nonce })
+          })
+          .then(response => response.json())
+          .then(data => {
+            if (data.success) {
+              alert("✅ Payment successful!");
+            } else {
+              alert("❌ Payment failed: " + data.message);
+            }
+          })
+          .catch(err => alert("❗ Network error: " + err.message));
+        }
+      }
+    });
+
+    window.onload = function () {
+      try {
+        paymentForm.build();
+        console.log("🛠️ Payment form built.");
+      } catch (e) {
+        console.error("❌ Error building form:", e);
+      }
+
+      const payButton = document.getElementById("sq-creditcard");
+      payButton.addEventListener("click", function (event) {
+        event.preventDefault();
+        try {
+          paymentForm.requestCardNonce();
+        } catch (e) {
+          console.error("❌ Failed to request card nonce:", e);
+        }
+      });
+    };
+  </script>
+</body>
+</html>
+

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Flying Fingers Typing - Loading</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="description" content="Professional typing and transcription services. Serving business, legal, and personal clients with speed and accuracy.">
+
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      background-color: #1f1f26; /* backdrop */
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+    }
+
+    .logo-container {
+      animation: slideInFromRight .5s ease-out forwards;
+    }
+
+    .logo-container img {
+      width: 150vw;
+      max-width: 250px;
+      height: auto;
+    }
+
+    @keyframes slideInFromRight {
+      0% {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+      100% {
+        transform: translateX(0%);
+        opacity: 1;
+      }
+    }
+
+    .fadeout {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: white;
+      opacity: 0;
+      transition: opacity 0.2s ease-in-out;
+      z-index: 10;
+    }
+
+    .fadeout.active {
+      opacity: 1;
+    }
+  </style>
+
+
+
+</head>
+<body>
+  <div class="logo-container">
+    <img src="assets/images/Newer FFT Logo.png" alt="Flying Fingers Typing Logo">
+  </div>
+
+  <div class="fadeout" id="fadeScreen"></div>
+
+  <script>
+    setTimeout(() => {
+      document.getElementById('fadeScreen').classList.add('active');
+    }, 1500);
+
+    setTimeout(() => {
+      window.location.href = "main.html"; // Change this to "index.html" if needed
+    }, 2500);
+  </script>
+</body>
+</html>
